@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Log In - Lost and Found</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="top-page-wrapper">
+        <div class="top-auth-bar">
+            <button type="button" class="back-btn" onclick="window.location.href='main.html'">
+                <span class="arrow">←</span> Return
+            </button>
+            <div style="color: #bbb; font-size: 13px;">Login Portal</div>
+        </div>
+    </div>
+
+    <div class="login-container">
+        <form class="login-form" id="loginForm">
+            <h1 class="form-title">log in</h1>
+            <div class="input-group">
+                <label>user name(or ID):</label>
+                <input type="text" id="username" class="main-input" required>
+            </div>
+            <div class="input-group">
+                <label>password:</label>
+                <input type="password" id="password" class="main-input" required>
+            </div>
+            <div class="form-actions">
+                <button type="button" class="btn-secondary" onclick="toggleHint()">forgot PW</button>
+                <button type="submit" class="btn-primary">submit</button>
+            </div>
+            <div id="hintSection" class="hint-text" style="display:none; margin-top:15px; color:#666; font-style:italic;"></div>
+        </form>
+    </div>
+
+    <script>
+        // Ensure a default password exists if never changed
+        if (!localStorage.getItem('userPassword')) {
+            localStorage.setItem('userPassword', '123456');
+        }
+
+        function toggleHint() {
+            const hint = document.getElementById('hintSection');
+            const currentPw = localStorage.getItem('userPassword');
+            hint.innerText = `↳ Hint: Username is 'myhkmu', PW is '${currentPw}'`;
+            hint.style.display = (hint.style.display === 'block') ? 'none' : 'block';
+        }
+
+        document.getElementById('loginForm').onsubmit = (e) => {
+            e.preventDefault();
+            const userVal = document.getElementById('username').value;
+            const passVal = document.getElementById('password').value;
+            const savedPw = localStorage.getItem('userPassword');
+
+            if (userVal === "myhkmu" && passVal === savedPw) {
+                localStorage.setItem('isLoggedIn', 'true');
+                localStorage.setItem('currentUser', 'myhkmu');
+                window.location.href = 'main.html';
+            } else {
+                alert("Invalid Credentials.");
+            }
+        };
+    </script>
+</body>
+</html>

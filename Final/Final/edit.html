@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Profile - Lost and Found</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        /* 只补充对齐主题的样式，不冲突 */
+        .avatar-circle {
+            width: 90px;
+            height: 90px;
+            border-radius: 50%;
+            background: #f8f9fa;
+            border: 1px solid #dfe6e9;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+        .avatar-circle img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        /* 按钮统一改成淡蓝色背景（和全站一致） */
+        .profile-action-btn {
+            padding: 8px 14px;
+            border: none;
+            border-radius: 10px;
+            background: #e3f2fd; /* 淡蓝色背景 */
+            color: #1976d2;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 14px;
+            transition: 0.2s;
+        }
+        .profile-action-btn:hover {
+            background: #bbdefb;
+            color: #0d47a1;
+        }
+        .info-row {
+            margin: 22px 0;
+            display: flex;
+            align-items: center;
+            font-size: 15px;
+        }
+        .info-label {
+            font-weight: bold;
+            color: #2d3436;
+            min-width: 90px;
+            font-size: 15px;
+        }
+        .contact-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            width: 100%;
+        }
+        .contact-list li {
+            padding: 10px 12px;
+            border-bottom: 1px solid #f1f3f5;
+            color: #636e72;
+            font-size: 15px;
+        }
+        .form-title {
+            margin-bottom: 10px !important;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- 顶部导航栏（和全站统一） -->
+    <div class="top-auth-bar">
+        <button class="back-btn" onclick="window.location.href='main.html'">← Back</button>
+        <div>Edit Profile</div>
+    </div>
+
+    <!-- 主体容器（主题卡片样式） -->
+    <div class="login-container" style="max-width: 500px; margin-top: 100px;">
+        <h1 class="form-title">edit profile</h1>
+        <div style="height:1px; background:#eee; margin:10px 0 25px 0;"></div>
+
+        <!-- 头像上传 -->
+        <div style="margin-bottom: 30px;">
+            <label style="font-size:14px; color:#b2bec3; font-weight:600;">Profile Image</label>
+            <div style="display:flex; align-items:center; gap:18px; margin-top:12px;">
+                <div class="avatar-circle">
+                    <img id="profileImg" src="https://uxwing.com/wp-content/themes/uxwing/download/peoples-avatars/no-profile-picture-icon.png">
+                </div>
+                <input type="file" id="avatarInput" hidden accept="image/*">
+                <button class="profile-action-btn" onclick="document.getElementById('avatarInput').click()">
+                    Upload
+                </button>
+            </div>
+        </div>
+
+        <!-- 用户名 -->
+        <div class="info-row">
+            <span class="info-label">name</span>
+            <span style="flex:1; color:#2d3436;" id="displayName">Guest</span>
+            <button class="profile-action-btn" onclick="editName()">edit</button>
+        </div>
+
+        <!-- 联系方式 -->
+        <div class="info-row" style="align-items:flex-start; padding-top:8px;">
+            <span class="info-label">contact</span>
+            <div style="flex:1;">
+                <ul class="contact-list" id="contactList"></ul>
+                <div style="display:flex; gap:8px; margin-top:10px;">
+                    <button class="profile-action-btn" onclick="addContact()">add</button>
+                    <button class="profile-action-btn" onclick="deleteLastContact()" style="background:#ffebee; color:#e53935;">
+                        delete
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- userID -->
+        <div class="info-row">
+            <span class="info-label">userID</span>
+            <span style="flex:1; color:#636e72;" id="displayID">10073241</span>
+        </div>
+
+        <!-- password -->
+        <div class="info-row">
+            <span class="info-label">password</span>
+            <span style="flex:1; color:#636e72;" id="passwordStars">••••••••</span>
+            <button class="profile-action-btn" onclick="changePass()">change</button>
+        </div>
+    </div>
+
+<script>
+window.onload = () => {
+    document.getElementById('displayName').innerText = localStorage.getItem('currentUser') || "Guest";
+    document.getElementById('displayID').innerText = localStorage.getItem('uID') || "10073241";
+    
+    const savedImg = localStorage.getItem('profileImage');
+    if(savedImg) document.getElementById('profileImg').src = savedImg;
+    
+    const savedContacts = JSON.parse(localStorage.getItem('userContacts')) || ["+852 xxxx xxxx"];
+    const list = document.getElementById('contactList');
+    list.innerHTML = '';
+    savedContacts.forEach(c => {
+        const li = document.createElement('li');
+        li.innerText = c;
+        list.appendChild(li);
+    });
+};
+function syncContacts() {
+    const listItems = document.querySelectorAll('#contactList li');
+    const contactArray = Array.from(listItems).map(li => li.innerText);
+    localStorage.setItem('userContacts', JSON.stringify(contactArray));
+}
+function addContact() {
+    const val = prompt("Enter contact info:");
+    if(val) {
+        const li = document.createElement('li');
+        li.innerText = val;
+        document.getElementById('contactList').appendChild(li);
+        syncContacts();
+    }
+}
+function deleteLastContact() {
+    const list = document.getElementById('contactList');
+    if(list.lastElementChild) {
+        list.removeChild(list.lastElementChild);
+        syncContacts();
+    }
+}
+function editName() {
+    const name = prompt("Enter name:", document.getElementById('displayName').innerText);
+    if(name) {
+        document.getElementById('displayName').innerText = name;
+        localStorage.setItem('currentUser', name);
+    }
+}
+document.getElementById('avatarInput').onchange = function(e) {
+    const file = e.target.files[0];
+    if (file) {
+        const reader = new FileReader();
+        reader.onload = (event) => {
+            const dataUrl = event.target.result;
+            document.getElementById('profileImg').src = dataUrl;
+            localStorage.setItem('profileImage', dataUrl);
+        };
+        reader.readAsDataURL(file);
+    }
+};
+function changePass() {
+    const newPass = prompt("Enter new password:");
+    if (newPass && newPass.trim().length > 0) {
+        localStorage.setItem('userPassword', newPass);
+        alert("Password updated successfully!");
+    }
+}
+</script>
+</body>
+</html>

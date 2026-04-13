@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payment - Lost and Found</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        .payment-body { 
+            padding: 20px; 
+            font-family: sans-serif; 
+            max-width: 400px; 
+            margin: 0 auto; 
+            color: #333; 
+        }
+
+        .payment-header { 
+            font-size: 32px; 
+            font-weight: bold; 
+            margin-bottom: 5px; 
+        }
+
+        .header-line { 
+            height: 2px; 
+            background: #333; 
+            width: 100%; 
+            margin-bottom: 20px; 
+        }
+
+        .balance-row { 
+            text-align: right; 
+            font-size: 18px; 
+            margin-bottom: 20px; 
+            font-weight: 500;
+        }
+
+        .buy-option {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border: 2px solid #333;
+            padding: 12px 20px;
+            margin-bottom: 12px;
+            border-radius: 8px;
+            font-size: 20px;
+            cursor: pointer;
+            background: white;
+            transition: 0.2s;
+        }
+
+        .buy-option:hover { 
+            background: #f0f0f0; 
+        }
+
+        .buy-option span:first-child {
+            font-weight: bold;
+        }
+
+        .withdraw-container {
+            margin-top: 40px;
+            display: flex;
+            justify-content: flex-start;
+        }
+
+        .withdraw-btn {
+            border: 2px solid #333;
+            padding: 10px 30px;
+            font-size: 24px;
+            font-weight: bold;
+            background: white;
+            border-radius: 8px;
+            cursor: pointer;
+            color: #333;
+            transition: 0.2s;
+        }
+
+        .withdraw-btn:hover { 
+            background: #fff9db; 
+        }
+
+        .back-btn { 
+            background: none; 
+            border: none; 
+            font-weight: bold; 
+            cursor: pointer; 
+            font-size: 16px;
+            margin-bottom: 10px;
+            padding: 0;
+        }
+    </style>
+</head>
+<body class="payment-body">
+
+    <button type="button" class="back-btn" onclick="window.history.back()">← back</button>
+
+    <div class="payment-header">buy © / withdraw</div>
+    <div class="header-line"></div>
+
+    <div class="balance-row">
+        balance: <span id="currentBal" style="color: #2ecc71;">0</span> ©
+    </div>
+
+    <div class="buy-option" onclick="processPurchase(1, 8)">
+        <span>1 ©</span> <span>$8 HKD</span>
+    </div>
+    <div class="buy-option" onclick="processPurchase(5, 40)">
+        <span>5 ©</span> <span>$40 HKD</span>
+    </div>
+    <div class="buy-option" onclick="processPurchase(10, 80)">
+        <span>10 ©</span> <span>$80 HKD</span>
+    </div>
+    <div class="buy-option" onclick="processPurchase(20, 160)">
+        <span>20 ©</span> <span>$160 HKD</span>
+    </div>
+    <div class="buy-option" onclick="processPurchase(50, 400)">
+        <span>50 ©</span> <span>$400 HKD</span>
+    </div>
+    <div class="buy-option" onclick="processPurchase(100, 800)">
+        <span>100 ©</span> <span>$800 HKD</span>
+    </div>
+
+    <div class="withdraw-container">
+        <button class="withdraw-btn" onclick="handleWithdraw()">withdraw</button>
+    </div>
+
+    <script>
+        function updateDisplay() {
+            const bal = localStorage.getItem('userBalance') || 0;
+            document.getElementById('currentBal').innerText = bal;
+        }
+
+        window.onload = updateDisplay;
+
+        function processPurchase(amount, cost) {
+            if(confirm(`Confirm purchase of ${amount}© for $${cost} HKD?`)) {
+                let currentBal = parseInt(localStorage.getItem('userBalance')) || 0;
+                localStorage.setItem('userBalance', currentBal + amount);
+                updateDisplay();
+                alert("Top-up successful!");
+            }
+        }
+
+        function handleWithdraw() {
+            let currentBal = parseInt(localStorage.getItem('userBalance')) || 0;
+            const MIN_WITHDRAW = 10;
+            const FEE_RATE = 0.20; // 20%
+
+            // 1. Check if user meets the absolute minimum requirement
+            if (currentBal < MIN_WITHDRAW) {
+                alert(`Minimum withdrawal amount is ${MIN_WITHDRAW}©. Your current balance is only ${currentBal}©.`);
+                return;
+            }
+
+            // 2. Ask user for the amount
+            let withdrawInput = prompt(
+                `Withdrawal Rules:\n` +
+                `- 20% Transaction Fee\n` +
+                `- Minimum: ${MIN_WITHDRAW}©\n\n` +
+                `How many credits would you like to withdraw? (Max: ${currentBal}©)`, 
+                currentBal
+            );
+
+            // 3. Validate the input
+            if (withdrawInput === null) return; 
+            
+            let withdrawAmount = parseInt(withdrawInput);
+
+            if (isNaN(withdrawAmount) || withdrawAmount < MIN_WITHDRAW) {
+                alert(`Please enter a valid number. The minimum withdrawal is ${MIN_WITHDRAW}©.`);
+                return;
+            }
+
+            if (withdrawAmount > currentBal) {
+                alert("Insufficient balance! You cannot withdraw more than you have.");
+                return;
+            }
+
+            // 4. Calculate Fee and Final Amount
+            let fee = Math.floor(withdrawAmount * FEE_RATE); 
+            let receiveAmount = withdrawAmount - fee;
+
+            // 5. Final Confirmation
+            let confirmMsg = `Withdrawal Summary:\n` +
+                            `------------------------\n` +
+                            `Amount: ${withdrawAmount}©\n` +
+                            `Fee (20%): -${fee}©\n` +
+                            `You will receive: ${receiveAmount}©\n\n` +
+                            `Proceed?`;
+
+            if(confirm(confirmMsg)) {
+                let newBalance = currentBal - withdrawAmount;
+                localStorage.setItem('userBalance', newBalance);
+                updateDisplay();
+                alert(`Withdrawal successful! ${withdrawAmount}© has been deducted from your account.`);
+            }
+        }
+    </script>
+</body>
+</html>

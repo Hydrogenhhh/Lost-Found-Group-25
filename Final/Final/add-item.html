@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Item - Lost and Found</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body class="add-page">
+
+<div class="top-auth-bar">
+    <button type="button" class="back-btn" onclick="window.location.href='main.html'">← Back</button>
+    <div>Create New Listing</div>
+</div>
+
+<div class="add-container">
+    <h1 class="form-title">add item +</h1>
+
+    <div class="add-main-layout">
+        <!-- 图片上传区 -->
+        <div class="image-section">
+            <div class="image-placeholder" id="imagePreview">
+                <span style="font-size: 40px; color: #ccc;">?</span>
+            </div>
+            <input type="file" id="fileInput" hidden accept="image/*">
+            <button type="button" onclick="document.getElementById('fileInput').click()" 
+                    style="margin-top:8px; padding:8px 14px; border-radius:10px; border:1px solid #ddd; background:#fff; cursor:pointer;">
+                Select Image
+            </button>
+        </div>
+
+        <!-- 信息填写区 -->
+        <div class="details-section">
+            <!-- 标签：位置往下移 + 改变背景色 -->
+            <div class="tag-row" style="margin-top:22px; margin-bottom:16px; display:flex; align-items:center;">
+                <button class="tag-circle" type="button" id="plusTagBtn">+</button>
+                <span style="font-weight:bold; margin-left:8px;">Tag</span>
+                <div id="tagList" style="margin-left:8px; display:flex; gap:6px; flex-wrap:wrap;"></div>
+            </div>
+            <div class="tag-input-box" id="tagInputBox">
+                <input type="text" id="tagInputField" placeholder="school, lost, card…" class="main-input" style="max-width:160px;">
+                <button type="button" id="confirmTagBtn" style="margin-left:8px; color:#74b9ff; font-weight:bold; border:none; background:none; cursor:pointer;">Add</button>
+            </div>
+
+            <!-- 悬赏 -->
+            <div class="reward-row" style="margin:20px 0; align-items:center; font-weight:bold;">
+                <label>Reward:</label>
+                <input type="number" id="rewardInput" class="small-input" value="0" min="0">
+                <span>©</span>
+            </div>
+
+            <!-- 物品细节描述（新增） -->
+            <div class="input-group">
+                <label>Item Details</label>
+                <textarea class="main-input" id="detailInput" rows="3" 
+                          placeholder="Describe the item: color, brand, features, where lost…"></textarea>
+            </div>
+
+            <!-- 联系方式（新增） -->
+            <div class="input-group">
+                <label>Contact Info</label>
+                <input type="text" class="main-input" id="contactInput" 
+                       placeholder="Phone / WeChat / Email …">
+            </div>
+        </div>
+    </div>
+
+    <!-- 按钮 -->
+    <div class="bottom-actions">
+        <button type="button" onclick="handlePost(false)" class="btn-secondary">Post</button>
+        <button type="button" onclick="handlePost(true)" class="btn-primary">Promo (+5©)</button>
+    </div>
+</div>
+
+<!-- 余额不足弹窗 -->
+<div id="buyOverlay" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.4); z-index:2000; justify-content:center; align-items:center;">
+    <div class="popup-card" style="background:#fff; padding:30px; border-radius:16px; width:320px; text-align:center;">
+        <h3 style="margin-bottom:12px;">Insufficient Funds</h3>
+        <p id="insufficientMsg" style="color:#666; margin-bottom:24px;"></p>
+        <div style="display:flex; gap:12px;">
+            <button onclick="window.location.href='payment.html'" class="btn-primary" style="flex:1;">Buy ©</button>
+            <button onclick="closePopup()" class="btn-secondary" style="flex:1;">Cancel</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    let capturedImageData = "";
+    const tagList = document.getElementById('tagList');
+    const tagInputBox = document.getElementById('tagInputBox');
+    const tagInputField = document.getElementById('tagInputField');
+
+    // 添加标签
+    document.getElementById('plusTagBtn').onclick = () => {
+        tagInputBox.style.display = 'flex';
+        tagInputField.focus();
+    };
+    document.getElementById('confirmTagBtn').onclick = () => {
+        const val = tagInputField.value.trim();
+        if (val) {
+            const newPill = document.createElement('div');
+            newPill.className = 'tag-pill';
+            newPill.innerText = val;
+            newPill.onclick = () => newPill.remove();
+            
+            // 直接在这里设置 tag 样式：背景色 + 样式
+            newPill.style.background = "#e3f2fd";
+            newPill.style.color = "#0277bd";
+            newPill.style.padding = "5px 11px";
+            newPill.style.borderRadius = "20px";
+            newPill.style.fontSize = "14px";
+            newPill.style.cursor = "pointer";
+            
+            tagList.appendChild(newPill);
+            tagInputField.value = '';
+            tagInputBox.style.display = 'none';
+        }
+    };
+
+    // 图片预览
+    document.getElementById('fileInput').onchange = evt => {
+        const file = evt.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = e => {
+                capturedImageData = e.target.result;
+                document.getElementById('imagePreview').innerHTML = `<img src="${capturedImageData}" style="width:100%;height:100%;object-fit:cover;">`;
+            };
+            reader.readAsDataURL(file);
+        }
+    };
+
+    // 发布
+    function handlePost(isPromo) {
+        let balance = parseInt(localStorage.getItem('userBalance')) || 0;
+        const reward = parseInt(document.getElementById('rewardInput').value) || 0;
+        const details = document.getElementById('detailInput').value.trim() || "No details";
+        const contact = document.getElementById('contactInput').value.trim() || "No contact";
+
+        const promoCost = 5;
+        const totalRequired = isPromo ? (reward + promoCost) : reward;
+
+        if (balance < totalRequired) {
+            document.getElementById('insufficientMsg').innerText = `Need ${totalRequired}©. You have ${balance}©.`;
+            document.getElementById('buyOverlay').style.display = 'flex';
+            return;
+        }
+
+        const tags = Array.from(tagList.querySelectorAll('.tag-pill')).map(t => t.innerText);
+        const items = JSON.parse(localStorage.getItem('lostItems')) || [];
+
+        items.unshift({
+            user: localStorage.getItem('currentUser') || "Guest",
+            reward: reward,
+            description: tags.join(", ") || "No tags",
+            details: details,
+            contact: contact,
+            time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+            isPromo: isPromo,
+            image: capturedImageData
+        });
+
+        localStorage.setItem('lostItems', JSON.stringify(items));
+        localStorage.setItem('userBalance', balance - totalRequired);
+        window.location.href = 'main.html';
+    }
+
+    function closePopup() {
+        document.getElementById('buyOverlay').style.display = 'none';
+    }
+</script>
+
+</body>
+</html>

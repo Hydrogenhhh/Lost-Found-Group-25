@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lost and Found - Home</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        .del-btn {
+            margin-top: 8px;
+            background: #ff7675;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            padding: 5px 10px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: bold;
+            transition: 0.2s;
+        }
+        .del-btn:hover {
+            background: #d63031;
+        }
+        .card-right {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            justify-content: center;
+        }
+
+        /* 详情弹窗 —— 图片完全自适应修复 */
+        .detail-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+        }
+        .detail-modal {
+            background: white;
+            width: 90%;
+            max-width: 600px;
+            border-radius: 16px;
+            padding: 30px;
+            position: relative;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+        .close-detail {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            font-size: 22px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            z-index: 10;
+        }
+        .detail-img {
+            width: 100%;
+            max-height: 300px;
+            object-fit: contain; /* 关键：自适应不拉伸 */
+            background: #f5f5f5;
+            border-radius: 12px;
+            margin-bottom: 20px;
+        }
+        .detail-item {
+            margin: 10px 0;
+            font-size: 15px;
+        }
+        .detail-item strong {
+            color: #2d3436;
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="nav-left"><span class="logo-text">Lost & Found</span></div>
+        <div class="search-container">
+            <input class="search-bar" type="search" id="search-input" placeholder="Search..."/>
+        </div>
+        <div class="account-wrapper">
+            <button type="button" class="account-btn" id="profileBtn">
+                <img src="https://uxwing.com/wp-content/themes/uxwing/download/peoples-avatars/no-profile-picture-icon.png" id="navProfileImg" class="profile-img">
+            </button>
+            <div id="accountPanel" class="account-panel">
+                <div class="panel-header">Hi, <span id="user-greeting">Guest</span></div>
+                <hr style="margin: 10px 0; border: 0; border-top: 1px solid #eee;">
+                
+                <div id="user-controls" style="display: none;">
+                    <p style="font-size: 0.85rem; color: #636e72;">Balance: <span id="balance-display" style="font-weight: bold; color: #2ecc71;">0©</span></p>
+                    <button type="button" onclick="window.location.href='payment.html'" style="width: 100%; margin-top: 10px; padding: 10px; border: 1px solid #333; border-radius: 8px; background: #fff9db; cursor: pointer; font-weight: bold; color: #333;">Buy / Withdraw ©</button>
+                    <button type="button" class="edit-btn" onclick="window.location.href='edit.html'" style="width: 100%; margin-top: 10px; padding: 10px; border: 1px solid #333; border-radius: 8px; background: white; cursor: pointer; font-weight: bold;">Edit Profile</button>
+                    <button type="button" id="logoutBtn" style="width:100%; margin-top:10px; padding: 10px; border: none; border-radius: 8px; background: #ff7675; color: white; font-weight: bold; cursor: pointer;">Logout</button>
+                </div>
+                <div id="guest-controls">
+                    <a href="login.html" style="text-decoration: none; display: block; text-align: center; padding: 10px; background: #74b9ff; color: white; border-radius: 8px; font-weight: bold;">Login</a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- 修复 Add 按钮点击失效 -->
+    <a href="add-item.html" class="add-btn" id="floatingAddBtn">+</a>
+
+    <main class="main-container">
+        <div class="welcome-section"><h2>Recent Items</h2></div>
+        <div class="item-list" id="itemGrid"></div>
+    </main>
+
+    <!-- 详情弹窗 -->
+    <div class="detail-overlay" id="detailOverlay">
+        <div class="detail-modal">
+            <button class="close-detail" onclick="closeDetail()">×</button>
+            <img id="detailImg" class="detail-img">
+            <div class="detail-item"><strong>User:</strong> <span id="detailUser"></span></div>
+            <div class="detail-item"><strong>Time:</strong> <span id="detailTime"></span></div>
+            <div class="detail-item"><strong>Tag:</strong> <span id="detailTag"></span></div>
+            <div class="detail-item"><strong>Reward:</strong> <span id="detailReward"></span></div>
+            <div class="detail-item"><strong>Details:</strong> <span id="detailDetails"></span></div>
+            <div class="detail-item"><strong>Contact:</strong> <span id="detailContact"></span></div>
+        </div>
+    </div>
+
+    <script>
+        function renderItems() {
+            const items = JSON.parse(localStorage.getItem('lostItems')) || [];
+            const currentUser = localStorage.getItem('currentUser');
+            const grid = document.getElementById('itemGrid');
+            
+            grid.innerHTML = items.length ? '' : '<p style="text-align:center; color:#bbb; width:100%; margin-top:40px;">No items found.</p>';
+            items.forEach((item, index) => {
+                const card = document.createElement('div');
+                card.className = item.isPromo ? 'item-card-wide promo-card' : 'item-card-wide';
+                
+                const isOwner = currentUser && item.user === currentUser;
+                card.innerHTML = `
+                    <div class="card-left">
+                        <div class="item-icon-box">
+                            ${item.image ? `<img src="${item.image}" style="width:100%; height:100%; object-fit:cover; border-radius:8px;">` : '?'}
+                        </div>
+                    </div>
+                    <div class="card-mid">
+                        <div class="card-user-info"><strong>${item.user}</strong> • <span style="font-size:12px; color:#999;">${item.time}</span></div>
+                        <p style="font-size:14px; margin-top:5px;">${item.description}</p>
+                    </div>
+                    <div class="card-right">
+                        <div class="reward-tag">${item.reward}©</div>
+                        <button class="view-btn" onclick="openDetail(${index})">View</button>
+                        ${isOwner ? `<button class="del-btn" onclick="deleteItem(${index})">Delete</button>` : ''}
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        // 打开详情
+        function openDetail(index) {
+            const items = JSON.parse(localStorage.getItem('lostItems')) || [];
+            const item = items[index];
+            if (!item) return;
+
+            document.getElementById('detailImg').src = item.image || '';
+            document.getElementById('detailImg').style.display = item.image ? 'block' : 'none';
+            document.getElementById('detailUser').innerText = item.user;
+            document.getElementById('detailTime').innerText = item.time;
+            document.getElementById('detailTag').innerText = item.description;
+            document.getElementById('detailReward').innerText = item.reward + '©';
+            document.getElementById('detailDetails').innerText = item.details || 'No details';
+            document.getElementById('detailContact').innerText = item.contact || 'No contact';
+
+            document.getElementById('detailOverlay').style.display = 'flex';
+        }
+
+        // 关闭详情
+        function closeDetail() {
+            document.getElementById('detailOverlay').style.display = 'none';
+        }
+
+        function deleteItem(index) {
+            if (confirm("Are you sure you want to delete your post?")) {
+                let items = JSON.parse(localStorage.getItem('lostItems')) || [];
+                items.splice(index, 1);
+                localStorage.setItem('lostItems', JSON.stringify(items));
+                renderItems();
+            }
+        }
+
+        function updateUI() {
+            const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
+            document.getElementById('user-controls').style.display = isLoggedIn ? "block" : "none";
+            document.getElementById('guest-controls').style.display = isLoggedIn ? "none" : "block";
+            
+            if (isLoggedIn) {
+                document.getElementById('floatingAddBtn').style.display = "flex";
+                document.getElementById('user-greeting').innerText = localStorage.getItem('currentUser') || "User";
+                document.getElementById('balance-display').innerText = (localStorage.getItem('userBalance') || 0) + '©';
+                
+                const savedImg = localStorage.getItem('profileImage');
+                if(savedImg) document.getElementById('navProfileImg').src = savedImg;
+            } else {
+                document.getElementById('floatingAddBtn').style.display = "none";
+            }
+        }
+
+        document.getElementById('profileBtn').onclick = (e) => { 
+            e.stopPropagation(); 
+            document.getElementById('accountPanel').classList.toggle('active'); 
+        };
+        
+        document.addEventListener('click', () => {
+            document.getElementById('accountPanel').classList.remove('active');
+        });
+
+        document.getElementById('logoutBtn').onclick = () => { 
+            localStorage.removeItem('isLoggedIn'); 
+            window.location.reload(); 
+        };
+
+        window.onload = () => { 
+            updateUI();
+            renderItems();
+        };
+    </script>
+</body>
+</html>
