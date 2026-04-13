@@ -145,13 +145,11 @@
             const MIN_WITHDRAW = 10;
             const FEE_RATE = 0.20; // 20%
 
-            // 1. Check if user meets the absolute minimum requirement
             if (currentBal < MIN_WITHDRAW) {
                 alert(`Minimum withdrawal amount is ${MIN_WITHDRAW}©. Your current balance is only ${currentBal}©.`);
                 return;
             }
 
-            // 2. Ask user for the amount
             let withdrawInput = prompt(
                 `Withdrawal Rules:\n` +
                 `- 20% Transaction Fee\n` +
@@ -160,7 +158,6 @@
                 currentBal
             );
 
-            // 3. Validate the input
             if (withdrawInput === null) return; 
             
             let withdrawAmount = parseInt(withdrawInput);
@@ -175,11 +172,8 @@
                 return;
             }
 
-            // 4. Calculate Fee and Final Amount
             let fee = Math.floor(withdrawAmount * FEE_RATE); 
             let receiveAmount = withdrawAmount - fee;
-
-            // 5. Final Confirmation
             let confirmMsg = `Withdrawal Summary:\n` +
                             `------------------------\n` +
                             `Amount: ${withdrawAmount}©\n` +
