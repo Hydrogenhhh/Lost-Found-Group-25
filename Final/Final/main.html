@@ -27,8 +27,6 @@
             align-items: flex-end;
             justify-content: center;
         }
-
-        /* 详情弹窗 —— 图片完全自适应修复 */
         .detail-overlay {
             display: none;
             position: fixed;
@@ -64,7 +62,7 @@
         .detail-img {
             width: 100%;
             max-height: 300px;
-            object-fit: contain; /* 关键：自适应不拉伸 */
+            object-fit: contain; 
             background: #f5f5f5;
             border-radius: 12px;
             margin-bottom: 20px;
@@ -105,7 +103,6 @@
         </div>
     </header>
 
-    <!-- 修复 Add 按钮点击失效 -->
     <a href="add-item.html" class="add-btn" id="floatingAddBtn">+</a>
 
     <main class="main-container">
@@ -113,7 +110,6 @@
         <div class="item-list" id="itemGrid"></div>
     </main>
 
-    <!-- 详情弹窗 -->
     <div class="detail-overlay" id="detailOverlay">
         <div class="detail-modal">
             <button class="close-detail" onclick="closeDetail()">×</button>
