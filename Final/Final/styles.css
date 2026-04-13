@@ -10,7 +10,6 @@ body {
     padding-top: 80px;
 }
 
-/* --- HEADER --- */
 .header {
     display: flex;
     align-items: center;
@@ -32,7 +31,6 @@ body {
     border-radius: 20px; border: 1px solid #ddd; outline: none;
 }
 
-/* --- ACCOUNT DROPDOWN --- */
 .account-btn { background: none; border: none; cursor: pointer; }
 .profile-img { width: 40px; height: 40px; border-radius: 50%; }
 
@@ -51,7 +49,6 @@ body {
 .edit-btn { background: #f1f8e9; color: #388e3c; }
 .logout-btn { background: #ffebee; color: #c62828; }
 
-/* --- WIDE ITEM CARDS --- */
 .main-container { max-width: 800px; margin: 0 auto; padding: 20px; }
 .item-list { display: flex; flex-direction: column; gap: 15px; margin-top: 20px; }
 
@@ -80,7 +77,6 @@ body {
 .reward-tag { color: #2ecc71; font-weight: bold; font-size: 1.1rem; margin-bottom: 5px; }
 .view-btn { background: #74b9ff; color: white; border: none; padding: 5px 15px; border-radius: 5px; cursor: pointer; }
 
-/* --- FLOATING BUTTON --- */
 .add-btn {
     position: fixed; bottom: 30px; right: 30px;
     width: 60px; height: 60px; background: #74b9ff;
@@ -89,7 +85,6 @@ body {
     text-decoration: none; box-shadow: 0 4px 12px rgba(116, 185, 255, 0.4);
 }
 
-/* --- UNIVERSAL RESET & BODY --- */
 * {
     margin: 0;
     padding: 0;
@@ -102,7 +97,6 @@ body {
     color: #2d3436;
 }
 
-/* --- TOP NAVIGATION BAR --- */
 .top-auth-bar {
     position: fixed;
     top: 0; left: 0; width: 100%;
@@ -133,7 +127,6 @@ body {
     background: #f0f7ff;
 }
 
-/* --- PAGE TITLES --- */
 .form-title {
     font-size: 28px;
     font-weight: 800;
@@ -142,7 +135,6 @@ body {
     letter-spacing: -1px;
 }
 
-/* --- LOGIN CONTAINER --- */
 .login-container {
     max-width: 420px;
     margin: 120px auto 40px;
@@ -182,7 +174,6 @@ body {
     box-shadow: 0 0 0 4px rgba(116, 185, 255, 0.1);
 }
 
-/* --- ADD ITEM CONTAINER --- */
 .add-container {
     max-width: 720px;
     margin: 100px auto 40px;
@@ -215,7 +206,6 @@ body {
     margin-bottom: 15px;
 }
 
-/* Details Section */
 .details-section {
     flex: 1.2;
 }
@@ -248,7 +238,6 @@ body {
     font-weight: bold;
 }
 
-/* --- BUTTONS & ACTIONS --- */
 .form-actions, .bottom-actions {
     display: flex;
     gap: 12px;
@@ -280,7 +269,6 @@ body {
 .btn-primary:hover { background-color: #0984e3; }
 .btn-secondary:hover { background-color: #f8f9fa; }
 
-/* Hint Text */
 .hint-text {
     display: none;
     margin-top: 15px;
