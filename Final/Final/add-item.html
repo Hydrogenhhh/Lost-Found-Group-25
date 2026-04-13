@@ -17,7 +17,6 @@
     <h1 class="form-title">add item +</h1>
 
     <div class="add-main-layout">
-        <!-- 图片上传区 -->
         <div class="image-section">
             <div class="image-placeholder" id="imagePreview">
                 <span style="font-size: 40px; color: #ccc;">?</span>
@@ -29,9 +28,7 @@
             </button>
         </div>
 
-        <!-- 信息填写区 -->
         <div class="details-section">
-            <!-- 标签：位置往下移 + 改变背景色 -->
             <div class="tag-row" style="margin-top:22px; margin-bottom:16px; display:flex; align-items:center;">
                 <button class="tag-circle" type="button" id="plusTagBtn">+</button>
                 <span style="font-weight:bold; margin-left:8px;">Tag</span>
@@ -42,21 +39,16 @@
                 <button type="button" id="confirmTagBtn" style="margin-left:8px; color:#74b9ff; font-weight:bold; border:none; background:none; cursor:pointer;">Add</button>
             </div>
 
-            <!-- 悬赏 -->
             <div class="reward-row" style="margin:20px 0; align-items:center; font-weight:bold;">
                 <label>Reward:</label>
                 <input type="number" id="rewardInput" class="small-input" value="0" min="0">
                 <span>©</span>
             </div>
-
-            <!-- 物品细节描述（新增） -->
             <div class="input-group">
                 <label>Item Details</label>
                 <textarea class="main-input" id="detailInput" rows="3" 
                           placeholder="Describe the item: color, brand, features, where lost…"></textarea>
             </div>
-
-            <!-- 联系方式（新增） -->
             <div class="input-group">
                 <label>Contact Info</label>
                 <input type="text" class="main-input" id="contactInput" 
@@ -65,14 +57,12 @@
         </div>
     </div>
 
-    <!-- 按钮 -->
     <div class="bottom-actions">
         <button type="button" onclick="handlePost(false)" class="btn-secondary">Post</button>
         <button type="button" onclick="handlePost(true)" class="btn-primary">Promo (+5©)</button>
     </div>
 </div>
 
-<!-- 余额不足弹窗 -->
 <div id="buyOverlay" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.4); z-index:2000; justify-content:center; align-items:center;">
     <div class="popup-card" style="background:#fff; padding:30px; border-radius:16px; width:320px; text-align:center;">
         <h3 style="margin-bottom:12px;">Insufficient Funds</h3>
@@ -90,7 +80,6 @@
     const tagInputBox = document.getElementById('tagInputBox');
     const tagInputField = document.getElementById('tagInputField');
 
-    // 添加标签
     document.getElementById('plusTagBtn').onclick = () => {
         tagInputBox.style.display = 'flex';
         tagInputField.focus();
@@ -102,8 +91,6 @@
             newPill.className = 'tag-pill';
             newPill.innerText = val;
             newPill.onclick = () => newPill.remove();
-            
-            // 直接在这里设置 tag 样式：背景色 + 样式
             newPill.style.background = "#e3f2fd";
             newPill.style.color = "#0277bd";
             newPill.style.padding = "5px 11px";
@@ -117,7 +104,6 @@
         }
     };
 
-    // 图片预览
     document.getElementById('fileInput').onchange = evt => {
         const file = evt.target.files[0];
         if (file) {
@@ -130,7 +116,6 @@
         }
     };
 
-    // 发布
     function handlePost(isPromo) {
         let balance = parseInt(localStorage.getItem('userBalance')) || 0;
         const reward = parseInt(document.getElementById('rewardInput').value) || 0;
