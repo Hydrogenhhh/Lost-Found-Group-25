@@ -6,7 +6,6 @@
     <title>Edit Profile - Lost and Found</title>
     <link rel="stylesheet" href="styles.css">
     <style>
-        /* 只补充对齐主题的样式，不冲突 */
         .avatar-circle {
             width: 90px;
             height: 90px;
@@ -23,12 +22,11 @@
             height: 100%;
             object-fit: cover;
         }
-        /* 按钮统一改成淡蓝色背景（和全站一致） */
         .profile-action-btn {
             padding: 8px 14px;
             border: none;
             border-radius: 10px;
-            background: #e3f2fd; /* 淡蓝色背景 */
+            background: #e3f2fd; 
             color: #1976d2;
             cursor: pointer;
             font-weight: 600;
@@ -70,18 +68,15 @@
 </head>
 
 <body>
-    <!-- 顶部导航栏（和全站统一） -->
     <div class="top-auth-bar">
         <button class="back-btn" onclick="window.location.href='main.html'">← Back</button>
         <div>Edit Profile</div>
     </div>
 
-    <!-- 主体容器（主题卡片样式） -->
     <div class="login-container" style="max-width: 500px; margin-top: 100px;">
         <h1 class="form-title">edit profile</h1>
         <div style="height:1px; background:#eee; margin:10px 0 25px 0;"></div>
 
-        <!-- 头像上传 -->
         <div style="margin-bottom: 30px;">
             <label style="font-size:14px; color:#b2bec3; font-weight:600;">Profile Image</label>
             <div style="display:flex; align-items:center; gap:18px; margin-top:12px;">
@@ -95,14 +90,12 @@
             </div>
         </div>
 
-        <!-- 用户名 -->
         <div class="info-row">
             <span class="info-label">name</span>
             <span style="flex:1; color:#2d3436;" id="displayName">Guest</span>
             <button class="profile-action-btn" onclick="editName()">edit</button>
         </div>
 
-        <!-- 联系方式 -->
         <div class="info-row" style="align-items:flex-start; padding-top:8px;">
             <span class="info-label">contact</span>
             <div style="flex:1;">
